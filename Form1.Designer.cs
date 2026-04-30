@@ -33,7 +33,7 @@
             groupBox1 = new GroupBox();
             btnCircle = new Button();
             btnRectangle = new Button();
-            btnline = new Button();
+            btnLine = new Button();
             groupBox2 = new GroupBox();
             cmbColor = new ComboBox();
             groupBox3 = new GroupBox();
@@ -63,7 +63,7 @@
             // 
             groupBox1.Controls.Add(btnCircle);
             groupBox1.Controls.Add(btnRectangle);
-            groupBox1.Controls.Add(btnline);
+            groupBox1.Controls.Add(btnLine);
             groupBox1.Location = new Point(23, 108);
             groupBox1.Name = "groupBox1";
             groupBox1.Size = new Size(350, 139);
@@ -95,17 +95,17 @@
             btnRectangle.TextAlign = ContentAlignment.BottomCenter;
             btnRectangle.UseVisualStyleBackColor = true;
             // 
-            // btnline
+            // btnLine
             // 
-            btnline.Image = (Image)resources.GetObject("btnline.Image");
-            btnline.ImageAlign = ContentAlignment.TopCenter;
-            btnline.Location = new Point(6, 34);
-            btnline.Name = "btnline";
-            btnline.Size = new Size(92, 78);
-            btnline.TabIndex = 0;
-            btnline.Text = "직선";
-            btnline.TextAlign = ContentAlignment.BottomCenter;
-            btnline.UseVisualStyleBackColor = true;
+            btnLine.Image = (Image)resources.GetObject("btnLine.Image");
+            btnLine.ImageAlign = ContentAlignment.TopCenter;
+            btnLine.Location = new Point(6, 34);
+            btnLine.Name = "btnLine";
+            btnLine.Size = new Size(92, 78);
+            btnLine.TabIndex = 0;
+            btnLine.Text = "직선";
+            btnLine.TextAlign = ContentAlignment.BottomCenter;
+            btnLine.UseVisualStyleBackColor = true;
             // 
             // groupBox2
             // 
@@ -147,7 +147,7 @@
             // 
             btnOpenFile.BackColor = Color.Beige;
             btnOpenFile.Font = new Font("맑은 고딕", 14.1428576F, FontStyle.Bold, GraphicsUnit.Point, 129);
-            btnOpenFile.Location = new Point(918, 135);
+            btnOpenFile.Location = new Point(935, 135);
             btnOpenFile.Name = "btnOpenFile";
             btnOpenFile.Size = new Size(143, 93);
             btnOpenFile.TabIndex = 3;
@@ -158,7 +158,7 @@
             // 
             btnSaveFile.BackColor = Color.CornflowerBlue;
             btnSaveFile.Font = new Font("맑은 고딕", 14.1428576F, FontStyle.Bold, GraphicsUnit.Point, 129);
-            btnSaveFile.Location = new Point(1084, 135);
+            btnSaveFile.Location = new Point(1096, 135);
             btnSaveFile.Name = "btnSaveFile";
             btnSaveFile.Size = new Size(141, 93);
             btnSaveFile.TabIndex = 5;
@@ -170,7 +170,7 @@
             picCanvas.BackColor = Color.White;
             picCanvas.Location = new Point(23, 253);
             picCanvas.Name = "picCanvas";
-            picCanvas.Size = new Size(1202, 524);
+            picCanvas.Size = new Size(1214, 524);
             picCanvas.TabIndex = 6;
             picCanvas.TabStop = false;
             // 
@@ -204,7 +204,7 @@
         private GroupBox groupBox1;
         private Button btnCircle;
         private Button btnRectangle;
-        private Button btnline;
+        private Button btnLine;
         private GroupBox groupBox2;
         private ComboBox cmbColor;
         private GroupBox groupBox3;
