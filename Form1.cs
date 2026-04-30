@@ -19,6 +19,25 @@ namespace SimplePaint
         private Color currentColor = Color.Black;      // 현재 색상
         private int currentLineWidth = 2;              // 현재 선 두께
 
+        // [추가할 변수] 현재 확대/축소 비율 (1.0 = 100%)
+        private float zoomFactor = 1.0f;
+
+        // [추가할 헬퍼 메서드] 화면에 줌인/줌아웃된 좌표를 실제 비트맵의 좌표로 변환
+        private Point GetRealCoordinates(Point pt)
+        {
+            return new Point((int)(pt.X / zoomFactor), (int)(pt.Y / zoomFactor));
+        }
+
+        // [추가할 메서드] 줌 비율에 맞춰 캔버스(PictureBox)의 크기를 조절
+        private void UpdateCanvasSize()
+        {
+            if (canvasBitmap != null)
+            {
+                picCanvas.Width = (int)(canvasBitmap.Width * zoomFactor);
+                picCanvas.Height = (int)(canvasBitmap.Height * zoomFactor);
+            }
+        }
+
         public Form1()
         {
             InitializeComponent();
@@ -54,6 +73,11 @@ namespace SimplePaint
 
             trbLineWidth.ValueChanged += trbLineWidth_ValueChanged;
             btnSaveFile.Click += btnSaveFile_Click;
+            btnOpenFile.Click += btnOpenFile_Click;
+
+            trbZoom.ValueChanged += trbZoom_ValueChanged;
+            picCanvas.MouseWheel += Zoom_MouseWheel;
+            panel1.MouseWheel += Zoom_MouseWheel;
         }
 
         private void PicCanvas_MouseDown(object sender, MouseEventArgs e)
@@ -205,6 +229,81 @@ namespace SimplePaint
                         // 저장 권한 없음, 디스크 용량 부족 등의 에러 처리
                         MessageBox.Show("파일을 저장하는 중 오류가 발생했습니다.\n" + ex.Message, "저장 오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
+                }
+            }
+        }
+
+        private void btnOpenFile_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog ofd = new OpenFileDialog())
+            {
+                ofd.Title = "이미지 불러오기";
+                ofd.Filter = "이미지 파일 (*.png;*.jpg;*.jpeg;*.bmp)|*.png;*.jpg;*.jpeg;*.bmp|모든 파일 (*.*)|*.*";
+
+                if (ofd.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        // Image.FromFile로 바로 열면 파일 잠금(Lock) 현상이 발생해 
+                        // 나중에 덮어쓰기 저장이 안 될 수 있으므로 복사본을 만들어 사용합니다.
+                        using (Image tempImage = Image.FromFile(ofd.FileName))
+                        {
+                            // 1. 기존에 사용하던 캔버스 자원(메모리) 해제
+                            if (canvasGraphics != null) canvasGraphics.Dispose();
+                            if (canvasBitmap != null) canvasBitmap.Dispose();
+
+                            // 2. 불러온 이미지와 똑같은 크기의 새 비트맵 생성 및 이미지 복사
+                            canvasBitmap = new Bitmap(tempImage);
+
+                            // 3. 캔버스(PictureBox)의 크기를 불러온 이미지의 크기에 맞춤
+                            // (이미지가 크면 Panel의 AutoScroll 덕분에 자동으로 스크롤바가 생기고, 
+                            //  작으면 PictureBox 크기가 이미지 크기만큼 줄어듭니다.)
+                            picCanvas.Width = canvasBitmap.Width;
+                            picCanvas.Height = canvasBitmap.Height;
+
+                            // 4. 새로 만든 비트맵에 다시 그림을 그릴 수 있도록 Graphics 객체 재할당
+                            canvasGraphics = Graphics.FromImage(canvasBitmap);
+
+                            // 5. PictureBox에 새 비트맵 연결
+                            picCanvas.Image = canvasBitmap;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("이미지를 불러오는 중 오류가 발생했습니다.\n" + ex.Message, "불러오기 오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+        }
+
+        private void trbZoom_ValueChanged(object sender, EventArgs e)
+        {
+            // 트랙바의 값(10~500)을 백분율(0.1 ~ 5.0)로 변환
+            zoomFactor = trbZoom.Value / 100f;
+            UpdateCanvasSize();
+        }
+
+        private void Zoom_MouseWheel(object sender, MouseEventArgs e)
+        {
+            // 컨트롤(Ctrl) 키가 눌려있는지 확인
+            if (ModifierKeys.HasFlag(Keys.Control))
+            {
+                // 휠을 위로 굴리면 10씩 증가, 아래로 굴리면 10씩 감소
+                int zoomChange = e.Delta > 0 ? 10 : -10;
+                int newZoom = trbZoom.Value + zoomChange;
+
+                // 트랙바의 최소/최대치를 넘지 않도록 제한
+                if (newZoom < trbZoom.Minimum) newZoom = trbZoom.Minimum;
+                if (newZoom > trbZoom.Maximum) newZoom = trbZoom.Maximum;
+
+                trbZoom.Value = newZoom; // 값이 바뀌면 자동으로 UpdateCanvasSize()가 실행됨
+
+                // [스크롤 방지 핵심 코드]
+                // 이벤트 인자가 HandledMouseEventArgs로 변환 가능한지 확인 후,
+                // Handled를 true로 설정하여 패널의 기본 스크롤 동작을 완벽히 차단합니다.
+                if (e is HandledMouseEventArgs hme)
+                {
+                    hme.Handled = true;
                 }
             }
         }
