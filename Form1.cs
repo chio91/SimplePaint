@@ -53,6 +53,7 @@ namespace SimplePaint
             trbLineWidth.Value = 5;
 
             trbLineWidth.ValueChanged += trbLineWidth_ValueChanged;
+            btnSaveFile.Click += btnSaveFile_Click;
         }
 
         private void PicCanvas_MouseDown(object sender, MouseEventArgs e)
@@ -159,6 +160,53 @@ namespace SimplePaint
             currentLineWidth = trbLineWidth.Value; 
         }
 
+        private void btnSaveFile_Click(object sender, EventArgs e)
+        {
+            // SaveFileDialog 객체 생성 (사용 후 자동 해제를 위해 using 블록 사용)
+            using (SaveFileDialog sfd = new SaveFileDialog())
+            {
+                sfd.Title = "그림 저장하기";
+                // 파일 형식 필터 설정 (PNG, JPG, BMP)
+                sfd.Filter = "PNG 이미지 (*.png)|*.png|JPEG 이미지 (*.jpg)|*.jpg|비트맵 이미지 (*.bmp)|*.bmp";
+                sfd.DefaultExt = "png";      // 기본 확장자
+                sfd.AddExtension = true;     // 사용자가 확장자를 안 써도 자동으로 붙여줌
 
+                // 사용자가 '저장' 버튼을 눌렀을 경우
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        // 선택한 파일의 확장자를 가져와서 소문자로 변환
+                        string extension = System.IO.Path.GetExtension(sfd.FileName).ToLower();
+
+                        // 저장할 이미지 포맷 결정 (기본값 PNG)
+                        ImageFormat format = ImageFormat.Png;
+
+                        switch (extension)
+                        {
+                            case ".jpg":
+                            case ".jpeg":
+                                format = ImageFormat.Jpeg;
+                                break;
+                            case ".bmp":
+                                format = ImageFormat.Bmp;
+                                break;
+                            case ".png":
+                            default:
+                                format = ImageFormat.Png;
+                                break;
+                        }
+
+                        // 현재 그려진 비트맵(canvasBitmap)을 지정한 경로와 포맷으로 저장
+                        canvasBitmap.Save(sfd.FileName, format);
+                    }
+                    catch (Exception ex)
+                    {
+                        // 저장 권한 없음, 디스크 용량 부족 등의 에러 처리
+                        MessageBox.Show("파일을 저장하는 중 오류가 발생했습니다.\n" + ex.Message, "저장 오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+        }
     }
 }
