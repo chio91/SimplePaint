@@ -1,1 +1,23 @@
-# SimplePaint
+# (C# 코딩) 에코메신저
+
+## 개요
+- C# 프로그래밍학습
+- 1줄소개: 사용자키보드입력을받아서처리하는프로그램
+- 사용한플랫폼: 
+  - C#, .NET Windows Forms, Visual Studio, GitHub
+- 사용한컨트롤: 
+  - Label, Button, ComboBox, TrackBar, PictureBox
+- 사용한기술과구현한기능: 
+  - Visual Studio를 이용하여 UI 디자인
+
+
+## 실행화면(과제1)
+- 코드의 실행 스크린샷과 구현 내용 설명
+
+![실행화면](img/project1.png)
+
+- 구현한내용(위그림참조)
+  - UI 구성: 도형 선텍, 색 선텍, 굵기 선텍, 캔버스 구성
+  - 도형 선텍 : 버튼을 이용해 삽입할 도형(원, 사각형, 직선) 선텍
+  - 색 선텍 : ComboBox를 이용해 도형의 색(검정, 빨강, 파랑, 초록) 선텍
+  - 굵기 선텍 : TrackBar를 이용해 도형의 굵기 선텍
