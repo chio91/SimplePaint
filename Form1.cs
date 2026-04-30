@@ -82,34 +82,37 @@ namespace SimplePaint
 
         private void PicCanvas_MouseDown(object sender, MouseEventArgs e)
         {
-            isDrawing = true;             // 드래그시작
-            startPoint = e.Location;      // 시작점저장
+            isDrawing = true;
+            startPoint = GetRealCoordinates(e.Location); // [수정] 실제 좌표로 변환
         }
+
         private void PicCanvas_MouseMove(object sender, MouseEventArgs e)
         {
-            if (!isDrawing) return;       // 그림그리기와상관없는마우스움직임은무시
-            endPoint = e.Location;        // 현재위치갱신
-
-            // picCanvas를다시그려라(Paint 이벤트를발생시킨다)
-            picCanvas.Invalidate();       // 화면다시그리기(미리보기)
+            if (!isDrawing) return;
+            endPoint = GetRealCoordinates(e.Location);   // [수정] 실제 좌표로 변환
+            picCanvas.Invalidate();
         }
 
         private void PicCanvas_MouseUp(object sender, MouseEventArgs e)
         {
-            if (!isDrawing) return;     // 그림그리기와상관없는마우스움직임은무시
-            isDrawing = false;          // 드래그종료
-            endPoint = e.Location;
-            // 실제비트맵에도형그리기(확정)
+            if (!isDrawing) return;
+            isDrawing = false;
+            endPoint = GetRealCoordinates(e.Location);   // [수정] 실제 좌표로 변환
+
             using (Pen pen = new Pen(currentColor, currentLineWidth))
             {
                 DrawShape(canvasGraphics, pen, startPoint, endPoint);
             }
-            picCanvas.Invalidate();     // 다시그려서결과반영, Paint 이벤트발생
+            picCanvas.Invalidate();
         }
 
         private void PicCanvas_Paint(object sender, PaintEventArgs e)
         {
-            if (!isDrawing) return; // 점선펜(미리보기용)
+            if (!isDrawing) return;
+
+            // [추가] 그려질 화면(Graphics) 자체를 줌 비율만큼 확대/축소시킵니다.
+            e.Graphics.ScaleTransform(zoomFactor, zoomFactor);
+
             using (Pen previewPen = new Pen(currentColor, currentLineWidth))
             {
                 previewPen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dash;
@@ -258,8 +261,7 @@ namespace SimplePaint
                             // 3. 캔버스(PictureBox)의 크기를 불러온 이미지의 크기에 맞춤
                             // (이미지가 크면 Panel의 AutoScroll 덕분에 자동으로 스크롤바가 생기고, 
                             //  작으면 PictureBox 크기가 이미지 크기만큼 줄어듭니다.)
-                            picCanvas.Width = canvasBitmap.Width;
-                            picCanvas.Height = canvasBitmap.Height;
+                            UpdateCanvasSize();
 
                             // 4. 새로 만든 비트맵에 다시 그림을 그릴 수 있도록 Graphics 객체 재할당
                             canvasGraphics = Graphics.FromImage(canvasBitmap);
